@@ -12,15 +12,57 @@
 #define BUFSZ 1024
 
 typedef struct {
-    char pokemons[40][10]; //Limite de 40 pokemons com nomes de até 10 caracteres
+    char nome[10];
+
+    struct Pokemon* anterior;
+    struct Pokemon* proximo;
+}Pokemon;
+
+typedef struct {
+    //char pokemons[40][10]; //Limite de 40 pokemons com nomes de até 10 caracteres
     int numPokemons;
+
+    Pokemon* primeiro;
+    Pokemon* ultimo;
 }Pokedex;
+
+Pokemon* buscaNaPokedex(char* nome, Pokedex* pokedex){
+    Pokemon* pokemonAtual = pokedex->primeiro;
+
+    while(pokemonAtual != NULL){
+        if (strcmp(pokemonAtual->nome, nome)==0){
+            return pokemonAtual;
+        }
+        pokemonAtual = pokemonAtual->proximo;
+    }
+    return NULL;
+}
 
 //int adicionarPokemon(char nome[], Pokedex* pokedex){
 bool adicionarPokemon(char* nome, Pokedex* pokedex){
-    (*pokedex->pokemons)[pokedex->numPokemons] = nome;
-    pokedex->numPokemons++;
+    Pokemon* pokemon = buscaNaPokedex(nome, pokedex);
+
+    if (pokemon != NULL){
+        return false; //Já existe
+    } 
     
+    pokemon = malloc(sizeof(Pokemon));
+    strcpy(pokemon->nome, nome);
+    pokemon->anterior = NULL;
+    pokemon->proximo = NULL;
+
+    if (pokedex->primeiro == NULL){
+        pokedex->primeiro = pokemon;
+        pokedex->ultimo = pokemon;
+    }
+    else{
+        pokedex->ultimo->proximo = pokemon;
+        pokemon->anterior = pokedex->ultimo;
+        pokedex->ultimo = pokemon;
+
+        pokedex->numPokemons++;
+    }
+
     return true; //Por enquanto, pois ainda tenho que tratar quando já tem esse pokemon e não pode adicionar de novo
 }
 
