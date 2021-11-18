@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 
     while(1){ //Conversa, que dura até eu mandar kill ou até o servidor morrer comigo apertando Ctrl C
         memset(buf, 0, BUFSZ); //Limpa o buffer
-        printf("mensagem> ");
+        printf("mensagem> "); //Acho que é só > e quando recebe é <, ver nos testes disponibilizados
         fgets(buf, BUFSZ-1, stdin);
         //size_t count = send(s, buf, strlen(buf)+1, 0); //O quanto de bytes enviei
         size_t count = send(s, buf, strlen(buf), 0); //O quanto de bytes enviei

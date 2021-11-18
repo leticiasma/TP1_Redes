@@ -18,8 +18,8 @@ typedef struct {
 
 //int adicionarPokemon(char nome[], Pokedex* pokedex){
 bool adicionarPokemon(char* nome, Pokedex* pokedex){
-    // *pokedex->pokemons[pokedex->numPokemons] = nome;
-    // pokedex->numPokemons++;
+    (*pokedex->pokemons)[pokedex->numPokemons] = nome;
+    pokedex->numPokemons++;
     
     return true; //Por enquanto, pois ainda tenho que tratar quando já tem esse pokemon e não pode adicionar de novo
 }
@@ -80,13 +80,14 @@ int main(int argc, char **argv) {
             logexit("accept");
         }
 
+        char caddrstr[BUFSZ];
+        addrtostr(caddr, caddrstr, BUFSZ);
+        printf("[log] connection from %s\n", caddrstr);
+
         printf("Cliente conectado\n");
         bool clienteConectado = true;
 
         while(clienteConectado){
-            char caddrstr[BUFSZ];
-            addrtostr(caddr, caddrstr, BUFSZ);
-            printf("[log] connection from %s\n", caddrstr);
 
             char buf[BUFSZ];
             memset(buf, 0, BUFSZ);
@@ -97,21 +98,23 @@ int main(int argc, char **argv) {
 
             //Recebe pacotes da mensagem que o cliente enviou até eu receber um 0 no count ou um \n no buffer
             while(1){
-                //printf("ESPERANDO PACOTE\n");
+                printf("ESPERANDO PACOTE\n");
                 count = recv(csock, buf, BUFSZ - 1, 0);
                 if (count == 0){
                     clienteConectado = false;
                     break;
                 }
 
-                for (int i=total; i<buf+total; i++){
-                    if (buf[i] == '\n'){ //TALVEZ NÃO FUNCIONE
+                char barra_n[2] = "\n";
+                for (int i=total; i<count+total; i++){
+                    printf("'%c'\n",buf[i]);
+                    if (strcmp(&buf[i], barra_n)==0){ //TALVEZ NÃO FUNCIONE
                         mensagemCompleta = true;
                         break;
                     }
                 }
                 total += count;
-                printf("[msg] %s, %d bytes: %s\n", caddrstr, (int)count, buf);
+                
 
                 if (mensagemCompleta){
                     break;
@@ -119,8 +122,11 @@ int main(int argc, char **argv) {
             }
 
             if(!clienteConectado){
+                printf("CLIENTE DESCONECTADO\n");
                 break;
             }
+
+            printf("[msg] %s, %d bytes: %s\n", caddrstr, (int)total, buf);
 
             //int numTokens = 0;
             char mensagem[500]; //Máximo
@@ -136,38 +142,40 @@ int main(int argc, char **argv) {
             if(strcmp(token, "add\0")==0){ //Tratar depois add e mais nada, que deveria dar erro
                 printf("passou 3\n");
                 //printf("%s\n",token);
+                token = strtok(NULL, delimitadores);
                 while (token != NULL){
                     //++numTokens; //Acho que incrementa antes de printar, por exemplo
-                    token = strtok(NULL, delimitadores);
+                    
                     //printf("%s\n",token);
+                    char mensagemEnvio[500];
 
                     if (strlen(token)<=10){
-                        bool sucesso = adicionarPokemon(token, &pokedex);
+                        if (pokedex.numPokemons < 40){
+                            bool sucesso = adicionarPokemon(token, &pokedex);
 
-                        if (sucesso){
-                            char mensagemSucesso[500];
-                            strcat(mensagemSucesso, token);
-                            strcat(mensagemSucesso, " added");
-                            count = send(csock, mensagemSucesso, strlen(mensagemSucesso) + 1, 0); //TIRAR +1s por causa do \0 da monitora
-                            if (count != strlen(buf) + 1) { //Não sei se precisa dessa parte
-                                logexit("send");
+                            if (sucesso){
+                                strcat(mensagemEnvio, token);
+                                strcat(mensagemEnvio, " added");
                             }
+                            else{
+                                strcat(mensagemEnvio, token);
+                                strcat(mensagemEnvio, " already exists");
+                            }  
                         }
-                    //     else{
-                    //         char mensagemErro[] = "bla bla bla already exists";
-                    //         count = send(csock, mensagemErro, strlen(mensagemErro) + 1, 0);
-                    //         if (count != strlen(buf) + 1) { //Não sei se precisa dessa parte
-                    //             logexit("send");
-                    //         }
-                    //     }
+                        else{
+                            strcat(mensagemEnvio, "limit exceeded");
+                        }
                     }
-                    // else{
-                    //     char mensagemErro[] = "invalid message";
-                    //     count = send(csock, mensagemErro, strlen(mensagemErro) + 1, 0);
-                    //     if (count != strlen(buf) + 1) { //Não sei se precisa dessa parte
-                    //         logexit("send");
-                    //     }                       
-                    // }
+                    else{
+                        strcat(mensagemEnvio, "invalid message");                
+                    }
+
+                    count = send(csock, mensagemEnvio, strlen(mensagemEnvio)+1, 0); //TIRAR +1s por causa do \0 da monitora
+                    if (count != strlen(mensagemEnvio)+1) { //Não sei se precisa dessa parte
+                        logexit("send");
+                    }
+                    
+                    token = strtok(NULL, delimitadores);
                 }
             }
             else if (strcmp(token, "remove\0")==0){
@@ -188,12 +196,12 @@ int main(int argc, char **argv) {
             
 
             //sprintf(buf, "remote endpoint: %.1000s\n", caddrstr);
-            /*
-            count = send(csock, buf, strlen(buf) + 1, 0);
-            if (count != strlen(buf) + 1) {
-                logexit("send");
-            }
-            */
+            
+            // count = send(csock, buf, strlen(buf) + 1, 0);
+            // if (count != strlen(buf) + 1) {
+            //     logexit("send");
+            // }
+            
         }        
     }
     //close(csock);
