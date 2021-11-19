@@ -58,15 +58,16 @@ int main(int argc, char **argv) {
         //     logexit("send"); //Limpa o buffer
         // }
         if (count != strlen(buf)) {
-            logexit("send"); //Limpa o buffer
+            logexit("send"); 
         }
 
-        memset(buf, 0, BUFSZ);
+        memset(buf, 0, BUFSZ);//Limpa o buffer
         unsigned total = 0;
 
         mensagemCompleta = false;
         
-        while(1) { //Fica recebendo pacotes do servidos
+        while(1) { //Fica recebendo pacotes do servidor
+            printf("ESPERANDO PACOTE\n");
             count = recv(s, buf + total, BUFSZ - total, 0); //buf + total é a posiçõa da memória no buffer na qual começará a ser gravada a mensagem recebida pelo recv com tamanho máximo BUFSZ - total
             if (count == 0) { //Isso significa que o servidor morreu ou me matou NO SERVER <= 0
                 // Connection terminated.
@@ -74,14 +75,14 @@ int main(int argc, char **argv) {
                 break;
             }
 
-            //for (int i=total; i<buf+total; i++){
-            for (int i=total; i<strlen(buf); i++){
-                //if (strcmp(buf[i],"\n")==0){ //TALVEZ NÃO FUNCIONE
-                if (buf[i] == '\n'){
+            char barra_n[2] = "\n";
+            for (int i=total; i<count+total; i++){
+                if (strcmp(&buf[i], barra_n)==0){ //TALVEZ NÃO FUNCIONE
                     mensagemCompleta = true;
                     break;
                 }
             }
+            
             total += count;
 
             if(mensagemCompleta){
