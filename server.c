@@ -133,8 +133,10 @@ int main(int argc, char **argv) {
     addrtostr(addr, addrstr, BUFSZ); //"toString" do endereço binário
     printf("bound to %s, waiting connections\n", addrstr);
 
+    bool serverConectado = true;
+
     //Enquanto o server está vivo
-    while (1) {
+    while (serverConectado) {
         
         struct sockaddr_storage cstorage;
         struct sockaddr *caddr = (struct sockaddr *)(&cstorage);
@@ -348,19 +350,26 @@ int main(int argc, char **argv) {
                 }                              
             }
             else if (strcmp(token, "kill\0")==0){
-                
+                clienteConectado = false;
+                close(csock); //Fecha o servidor tbm mas não era para acontecer isso
+
+                serverConectado = false;
             }
             else{
                 //Desconectar o cliente
-                printf("NAO IDENTIFICOU O COMANDO!");
+                clienteConectado = false;
+                close(csock); //Fecha o servidor tbm mas não era para acontecer isso
             }
             
-            printf("Enviando msg\n");
-            strcat(mensagemEnvio, "\n");
-            count = send(csock, mensagemEnvio, strlen(mensagemEnvio)+1, 0); //TIRAR +1s por causa do \0 da monitora
-            if (count != strlen(mensagemEnvio)+1) { //Não sei se precisa dessa parte
-                logexit("send");
+            if (clienteConectado){
+                printf("Enviando msg\n");
+                strcat(mensagemEnvio, "\n");
+                count = send(csock, mensagemEnvio, strlen(mensagemEnvio)+1, 0); //TIRAR +1s por causa do \0 da monitora
+                if (count != strlen(mensagemEnvio)+1) { //Não sei se precisa dessa parte
+                    logexit("send");
+                }
             }
+
 
             //sprintf(buf, "remote endpoint: %.1000s\n", caddrstr);
             
