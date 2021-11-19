@@ -201,6 +201,8 @@ int main(int argc, char **argv) {
 
             char mensagemEnvio[500] = "";
 
+            pokedex.numPokemons = 38;
+
             if(strcmp(token, "add\0")==0){ //Tratar depois add e mais nada, que deveria dar erro
                 //printf("%s\n",token);
                 token = strtok(NULL, delimitadores);
@@ -210,12 +212,17 @@ int main(int argc, char **argv) {
                     
                     //printf("%s\n",token);
 
+                    if (strlen(mensagemEnvio)>0){
+                        strcat(mensagemEnvio, " ");
+                    }
+
                     if (strlen(token)<=10){
                         printf("Menor que 10\n");
                         if (pokedex.numPokemons < 40){
                             printf("Pokedex nao cheia\n");
                             bool sucesso = adicionarPokemon(token, &pokedex);
                             printf("Tentou add!\n");
+
                             if (sucesso){
                                 printf("Conseguiu add\n");
                                 strcat(mensagemEnvio, token);
