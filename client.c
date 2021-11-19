@@ -52,8 +52,10 @@ int main(int argc, char **argv) {
         memset(buf, 0, BUFSZ); //Limpa o buffer
         printf("mensagem> "); //Acho que é só > e quando recebe é <, ver nos testes disponibilizados
         fgets(buf, BUFSZ-1, stdin);
+        
         //size_t count = send(s, buf, strlen(buf)+1, 0); //O quanto de bytes enviei
         size_t count = send(s, buf, strlen(buf), 0); //O quanto de bytes enviei
+
         // if (count != strlen(buf)+1) {
         //     logexit("send"); //Limpa o buffer
         // }
@@ -67,7 +69,6 @@ int main(int argc, char **argv) {
         mensagemCompleta = false;
         
         while(1) { //Fica recebendo pacotes do servidor
-            printf("ESPERANDO PACOTE\n");
             count = recv(s, buf + total, BUFSZ - total, 0); //buf + total é a posiçõa da memória no buffer na qual começará a ser gravada a mensagem recebida pelo recv com tamanho máximo BUFSZ - total
             if (count == 0) { //Isso significa que o servidor morreu ou me matou NO SERVER <= 0
                 // Connection terminated.
@@ -82,7 +83,7 @@ int main(int argc, char **argv) {
                     break;
                 }
             }
-            
+
             total += count;
 
             if(mensagemCompleta){
@@ -93,7 +94,6 @@ int main(int argc, char **argv) {
         puts(buf); //Imprime o que recebeu
 
         if (desconectar){
-            //printf("desconectou");
             break;
         }
     }
