@@ -4,11 +4,11 @@
 
 int socketServidor;
 
-Pokemon* buscaNaPokedex(char* nome, Pokedex* pokedex){
+Pokemon* buscaNaPokedex(char* nomePokemon, Pokedex* pokedex){
     Pokemon* pokemonAtual = pokedex->primeiro;
 
     while(pokemonAtual != NULL){
-        if (strcmp(pokemonAtual->nome, nome)==0){
+        if (strcmp(pokemonAtual->nome, nomePokemon)==0){
             return pokemonAtual;
         }
         pokemonAtual = pokemonAtual->proximo;
@@ -35,15 +35,15 @@ void deletaPokedex(Pokedex* pokedex){
     }
 }
 
-bool adicionarPokemon(char* nome, Pokedex* pokedex){
-    Pokemon* pokemon = buscaNaPokedex(nome, pokedex);
+bool adicionarPokemon(char* nomePokemon, Pokedex* pokedex){
+    Pokemon* pokemon = buscaNaPokedex(nomePokemon, pokedex);
 
     if (pokemon != NULL){
         return false; //Já existe
     } 
     
     pokemon = malloc(sizeof(Pokemon));
-    strcpy(pokemon->nome, nome);
+    strcpy(pokemon->nome, nomePokemon);
     pokemon->anterior = NULL;
     pokemon->proximo = NULL;
 
@@ -61,8 +61,23 @@ bool adicionarPokemon(char* nome, Pokedex* pokedex){
     return true; //Por enquanto, pois ainda tenho que tratar quando já tem esse pokemon e não pode adicionar de novo
 }
 
-void removerPokemon(){
+void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex){
+    if(pokemon->anterior != NULL){
+        Pokemon* pokAnterior = pokemon->anterior;
+        pokAnterior->proximo = pokemon->proximo;
+    }
+    else{
+        pokedex->primeiro = pokemon->proximo;
+    }
 
+    if(pokemon->proximo == NULL){
+        pokedex->ultimo = pokemon->anterior;
+    }
+
+    pokemon->proximo = NULL;
+    pokemon->anterior = NULL;
+
+    pokedex->numPokemons--;
 }
 
 void consultarPokedex(){

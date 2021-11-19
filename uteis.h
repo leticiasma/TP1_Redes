@@ -33,13 +33,15 @@ typedef struct {
 //---------------------------------------------------------------------------------
 //FUNÇÕES
 
-Pokemon* buscaNaPokedex(char* nome, Pokedex* pokedex);
+Pokemon* buscaNaPokedex(char* nomePokemon, Pokedex* pokedex);
 void deletaPokedex(Pokedex* pokedex);
 
-bool adicionarPokemon(char* nome, Pokedex* pokedex);
-void removerPokemon();
+bool adicionarPokemon(char* nomePokemon, Pokedex* pokedex);
+void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex);
 void consultarPokedex();
 void trocarPokemon();
+
+bool verificaNome(char* nomePokemon);
 
 void configurarServidor(int argc, char **argv);
 

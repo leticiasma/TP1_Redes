@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
 
     configurarServidor(argc, argv);
 
-
     bool serverConectado = true;
 
     Pokedex pokedex;
@@ -61,10 +60,12 @@ int main(int argc, char **argv) {
 
                 //char barra_n[2] = "\n";
                 for (int i=total; i<count+total; i++){
+
                     if (strcmp(&buf[i], "\n")==0){
                         mensagemCompleta = true;
                         break;
                     }
+
                 }
                 total += count;
                 
@@ -137,22 +138,8 @@ int main(int argc, char **argv) {
                     Pokemon* pokemon = buscaNaPokedex(token, &pokedex);
 
                     if (pokemon != NULL){
-                        
-                        if(pokemon->anterior != NULL){
-                            Pokemon* pokAnterior = pokemon->anterior;
-                            pokAnterior->proximo = pokemon->proximo;
-                        }else{
-                            pokedex.primeiro = pokemon->proximo;
-                        }
 
-                        if(pokemon->proximo == NULL){
-                            pokedex.ultimo = pokemon->anterior;
-                        }
-
-                        pokemon->proximo = NULL;
-                        pokemon->anterior = NULL;
-
-                        pokedex.numPokemons--;
+                        removerPokemon(token, pokemon, &pokedex);
 
                         strcat(mensagemEnvio, token);
                         strcat(mensagemEnvio, " removed");
