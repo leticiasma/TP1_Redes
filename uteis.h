@@ -38,10 +38,10 @@ void deletaPokedex(Pokedex* pokedex);
 
 bool adicionarPokemon(char* nomePokemon, Pokedex* pokedex);
 void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex);
-void consultarPokedex();
-void trocarPokemon();
+// void consultarPokedex();
+// void trocarPokemon();
 
-bool verificaNome(char* nomePokemon);
+bool validarNome(char* nomePokemon);
 
 void configurarServidor(int argc, char **argv);
 

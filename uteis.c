@@ -80,13 +80,13 @@ void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex){
     pokedex->numPokemons--;
 }
 
-void consultarPokedex(){
+// void consultarPokedex(){
 
-}
+// }
 
-void trocarPokemon(){
+// void trocarPokemon(){
 
-}
+// }
 
 void configurarServidor(int argc, char **argv){
 
@@ -144,4 +144,28 @@ int aceitarConexaoCliente(){
 
         return socketCliente;
 
+}
+
+bool validarNome(char* nomePokemon){
+
+    if (strlen(nomePokemon)>10){
+        return false;
+    }
+    else{
+
+        char letra;
+
+        for (int i=0; i<strlen(nomePokemon); i++){
+
+            letra = nomePokemon[i];
+
+            if (!((letra >= 'a' && letra <= 'z') || (letra >= '0' && letra <= '9'))){
+                return false;
+            }
+
+        }
+    
+    }
+
+    return true;
 }

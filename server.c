@@ -99,13 +99,13 @@ int main(int argc, char **argv) {
                         strcat(mensagemEnvio, " ");
                     }
 
-                    if (strlen(token)<=10){
+                    if (validarNome(token)){
 
                         if (pokedex.numPokemons < 40){
 
-                            bool sucesso = adicionarPokemon(token, &pokedex);
+                            bool adicionou = adicionarPokemon(token, &pokedex);
 
-                            if (sucesso){
+                            if (adicionou){
                                 strcat(mensagemEnvio, token);
                                 strcat(mensagemEnvio, " added");
                             }
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
 
                 token = strtok(NULL, delimitadores);
 
-                if (strlen(token)<=10){
+                if (validarNome(token)){
 
                     Pokemon* pokemon = buscaNaPokedex(token, &pokedex);
 
@@ -192,10 +192,10 @@ int main(int argc, char **argv) {
                 token = strtok(NULL, delimitadores);
                 strcpy(nome2, token);
 
-                if(strlen(nome1)>10){
+                if(!validarNome(nome1)){
                     strcat(mensagemEnvio, "invalid message");
                 }
-                else if (strlen(nome2)>10){
+                else if (!validarNome(nome2)){
                     strcat(mensagemEnvio, "invalid message");
                 }
                 else{
