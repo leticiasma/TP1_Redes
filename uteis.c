@@ -4,6 +4,12 @@
 
 int socketServidor;
 
+void usage(int argc, char **argv) {
+    printf("usage: %socketServidor <v4|v6> <server port>\n", argv[0]);
+    printf("example: %socketServidor v4 51511\n", argv[0]);
+    exit(EXIT_FAILURE);
+}
+
 Pokemon* buscaNaPokedex(char* nomePokemon, Pokedex* pokedex){
     Pokemon* pokemonAtual = pokedex->primeiro;
 
@@ -90,9 +96,9 @@ void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex){
 
 void configurarServidor(int argc, char **argv){
 
-// if (argc < 3) {
-    //     usage(argc, argv);
-    // }
+    if (argc < 3) {
+            usage(argc, argv);
+        }
 
     //
     struct sockaddr_storage storage;
@@ -123,7 +129,7 @@ void configurarServidor(int argc, char **argv){
 
     char addrstr[BUFSZ];
     addrtostr(addr, addrstr, BUFSZ); //"toString" do endereço binário
-    printf("bound to %socketServidor, waiting connections\n", addrstr);
+    //printf("bound to %socketServidor, waiting connections\n", addrstr);
 
 }
 
@@ -140,7 +146,7 @@ int aceitarConexaoCliente(){
 
         char caddrstr[BUFSZ];
         addrtostr(caddr, caddrstr, BUFSZ);
-        printf("[log] connection from %socketServidor\n", caddrstr);
+        //printf("[log] connection from %socketServidor\n", caddrstr);
 
         return socketCliente;
 

@@ -13,11 +13,11 @@
 
 #define BUFSZ 1024
 
-void usage(int argc, char **argv) {
-    printf("usage: %socketServidor <v4|v6> <server port>\n", argv[0]);
-    printf("example: %socketServidor v4 51511\n", argv[0]);
-    exit(EXIT_FAILURE);
-}
+// void usage(int argc, char **argv) {
+//     printf("usage: %socketServidor <v4|v6> <server port>\n", argv[0]);
+//     printf("example: %socketServidor v4 51511\n", argv[0]);
+//     exit(EXIT_FAILURE);
+// }
 
 int main(int argc, char **argv) {
 
@@ -58,10 +58,10 @@ int main(int argc, char **argv) {
                     break;
                 }
 
-                //char barra_n[2] = "\n";
+                char barra_n[2] = "\n";
                 for (int i=total; i<count+total; i++){
 
-                    if (strcmp(&buf[i], "\n")==0){
+                    if (strcmp(&buf[i], barra_n)==0){
                         mensagemCompleta = true;
                         break;
                     }
@@ -238,9 +238,9 @@ int main(int argc, char **argv) {
             if (clienteConectado){
 
                 strcat(mensagemEnvio, "\n");
-                count = send(socketCliente, mensagemEnvio, strlen(mensagemEnvio)+1, 0); //TIRAR +1s por causa do \0 da monitora
+                count = send(socketCliente, mensagemEnvio, strlen(mensagemEnvio), 0); //TIRAR +1s por causa do \0 da monitora
                 
-                if (count != strlen(mensagemEnvio)+1) { //Não sei se precisa dessa parte
+                if (count != strlen(mensagemEnvio)) { //Não sei se precisa dessa parte
                     logexit("send");
                 }
 

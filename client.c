@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-void usage(int argc, char **argv) {
+void usageCliente(int argc, char **argv) {
 	printf("usage: %s <server IP> <server port>\n", argv[0]);
 	printf("example: %s 127.0.0.1 51511\n", argv[0]);
 	exit(EXIT_FAILURE);
@@ -20,12 +20,12 @@ void usage(int argc, char **argv) {
 
 int main(int argc, char **argv) {
 	if (argc < 3) {
-		usage(argc, argv);
+		usageCliente(argc, argv);
 	}
 
 	struct sockaddr_storage storage;
 	if (0 != addrparse(argv[1], argv[2], &storage)) {
-		usage(argc, argv);
+		usageCliente(argc, argv);
 	}
 
 	int s;
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 	char addrstr[BUFSZ];
 	addrtostr(addr, addrstr, BUFSZ);
 
-	printf("connected to %s\n", addrstr);
+	//printf("connected to %s\n", addrstr);
 
 	char buf[BUFSZ];
 
@@ -50,9 +50,9 @@ int main(int argc, char **argv) {
 
     while(1){ //Conversa, que dura até eu mandar kill ou até o servidor morrer comigo apertando Ctrl C
         memset(buf, 0, BUFSZ); //Limpa o buffer
-        printf("mensagem> "); //Acho que é só > e quando recebe é <, ver nos testes disponibilizados
+        //printf("mensagem> "); //Acho que é só > e quando recebe é <, ver nos testes disponibilizados
         fgets(buf, BUFSZ-1, stdin);
-        
+
         //size_t count = send(s, buf, strlen(buf)+1, 0); //O quanto de bytes enviei
         size_t count = send(s, buf, strlen(buf), 0); //O quanto de bytes enviei
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
                 break;
             }
         }
-        printf("received %u bytes\n", total);
+        //printf("received %u bytes\n", total);
         puts(buf); //Imprime o que recebeu
 
         if (desconectar){
