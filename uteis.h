@@ -15,14 +15,14 @@
 //---------------------------------------------------------------------------------
 //ESTRUTURAS
 
-typedef struct{
+typedef struct Pokemon{
     char nome[10];
 
     struct Pokemon* anterior;
     struct Pokemon* proximo;
 }Pokemon;
 
-typedef struct {
+typedef struct{
     //char pokemons[40][10]; //Limite de 40 pokemons com nomes de até 10 caracteres
     int numPokemons;
 
@@ -48,4 +48,4 @@ void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex);
 void configurarServidor(int argc, char **argv);
 int aceitarConexaoCliente();
 
-#endif;
+#endif
