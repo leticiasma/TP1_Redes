@@ -1,29 +1,12 @@
-#include "common.h"
+#include "uteisServer.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdbool.h>
-
-#include <sys/socket.h>
-#include <sys/types.h>
-
-#include "uteis.h"
-
-#define BUFSZ 1024
-
-// void usage(int argc, char **argv) {
-//     printf("usage: %socketServidor <v4|v6> <server port>\n", argv[0]);
-//     printf("example: %socketServidor v4 51511\n", argv[0]);
-//     exit(EXIT_FAILURE);
-// }
+//---------------------------------------------------------------------------------
 
 int main(int argc, char **argv) {
 
-    //ACHO QUE, SE FECHA O SERVIDOR, FECHA A POKEDEX
+    int socketServidor;
 
-    configurarServidor(argc, argv);
+    configurarServidor(argc, argv, &socketServidor);
 
     bool serverConectado = true;
 
@@ -34,7 +17,7 @@ int main(int argc, char **argv) {
 
     while (serverConectado) {
         
-        int socketCliente = aceitarConexaoCliente();
+        int socketCliente = aceitarConexaoCliente(&socketServidor);
 
         bool clienteConectado = true;
 
@@ -43,15 +26,17 @@ int main(int argc, char **argv) {
             char buf[BUFSZ];
             memset(buf, 0, BUFSZ);
 
+            //Número de bytes recebidos
             size_t count;
             unsigned total = 0;
 
             bool mensagemCompleta = false;
 
-            //Recebe pacotes da mensagemRecebida que o cliente enviou até eu receber um 0 no count ou um \n no buffer
+            /*Recebe pacotes da mensagemRecebida que o cliente enviou até eu receber 0 bytes no count ou 
+            um \n no buffer, indicando final da mensagem*/
             while(1){
 
-                count = recv(socketCliente, buf, BUFSZ - 1, 0);
+                count = recv(socketCliente, buf + total, BUFSZ - total, 0);
 
                 if (count == 0){
                     clienteConectado = false;
@@ -79,22 +64,29 @@ int main(int argc, char **argv) {
                 break;
             }
 
-            //printf("[msg] %socketServidor, %d bytes: %socketServidor\n", caddrstr, (int)total, buf);
+            fputs(buf, stdout);
 
-            //int numTokens = 0;
-            char mensagemRecebida[500] = ""; //Máximo
+            char mensagemRecebida[500] = ""; 
             char mensagemEnvio[500] = "";
-            const char delimitadores[] = " \n"; //OLHAR AS OUTRAS FORMAS DE DAR ESPAÇO
+            const char delimitadores[] = " \n";
             
             strcpy(mensagemRecebida, buf);         
             char *token = strtok(mensagemRecebida, delimitadores);
 
-            if(strcmp(token, "add\0")==0){ //Tratar depois add e mais nada, que deveria dar erro
+            if(strcmp(token, "add\0")==0){
 
                 token = strtok(NULL, delimitadores);
 
+                int numPokemonsAdd = 0;
+
                 while (token != NULL){
-                    //++numTokens; //Acho que incrementa antes de printar, por exemplo
+
+                    if (numPokemonsAdd >= 4){
+                        break;
+                    }
+
+                    numPokemonsAdd++;
+
                     if (strlen(mensagemEnvio)>0){
                         strcat(mensagemEnvio, " ");
                     }
@@ -139,7 +131,7 @@ int main(int argc, char **argv) {
 
                     if (pokemon != NULL){
 
-                        removerPokemon(token, pokemon, &pokedex);
+                        removerPokemon(pokemon, &pokedex);
 
                         strcat(mensagemEnvio, token);
                         strcat(mensagemEnvio, " removed");
@@ -156,7 +148,7 @@ int main(int argc, char **argv) {
                 }
 
             }
-            else if (strcmp(token, "list\0")==0){ //Tratar quando pede list e manda coisas aleatórias depois
+            else if (strcmp(token, "list\0")==0){
                 
                 if(pokedex.numPokemons == 0){
                     strcat(mensagemEnvio, "none");
@@ -192,10 +184,7 @@ int main(int argc, char **argv) {
                 token = strtok(NULL, delimitadores);
                 strcpy(nome2, token);
 
-                if(!validarNome(nome1)){
-                    strcat(mensagemEnvio, "invalid message");
-                }
-                else if (!validarNome(nome2)){
+                if(!validarNome(nome1) || !validarNome(nome2)){
                     strcat(mensagemEnvio, "invalid message");
                 }
                 else{
@@ -223,24 +212,35 @@ int main(int argc, char **argv) {
             }
             else if (strcmp(token, "kill\0")==0){
 
+                //Desconectar o cliente e o servidor
                 clienteConectado = false;
-                close(socketCliente); //Fecha o servidor tbm mas não era para acontecer isso
+                close(socketCliente);
 
                 serverConectado = false;
 
             }
             else{
+
                 //Desconectar o cliente
                 clienteConectado = false;
-                close(socketCliente); //Fecha o servidor tbm mas não era para acontecer isso
+                close(socketCliente);
+
             }
             
             if (clienteConectado){
 
+                char barra_n[2] = "\n";
+
+                for (int i=0; i<strlen(mensagemEnvio); i++){
+                    if (strcmp(&mensagemEnvio[i], barra_n)==0){
+                        break;
+                    }
+                }
+
                 strcat(mensagemEnvio, "\n");
-                count = send(socketCliente, mensagemEnvio, strlen(mensagemEnvio), 0); //TIRAR +1s por causa do \0 da monitora
+                count = send(socketCliente, mensagemEnvio, strlen(mensagemEnvio), 0);
                 
-                if (count != strlen(mensagemEnvio)) { //Não sei se precisa dessa parte
+                if (count != strlen(mensagemEnvio)) {
                     logexit("send");
                 }
 
@@ -249,6 +249,8 @@ int main(int argc, char **argv) {
         }  
 
     }
+
+    deletaPokedex(&pokedex);
 
     exit(EXIT_SUCCESS);
 

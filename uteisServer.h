@@ -1,16 +1,7 @@
-#ifndef UTEIS_H
-#define UTEIS_H
+#ifndef UTEIS_SERVER_H
+#define UTEIS_SERVER_H
 
 #include "common.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdbool.h>
-
-#include <sys/socket.h>
-#include <sys/types.h>
 
 //---------------------------------------------------------------------------------
 //ESTRUTURAS
@@ -33,19 +24,19 @@ typedef struct{
 //---------------------------------------------------------------------------------
 //FUNÇÕES
 
+//Pokemon
+bool validarNome(char* nomePokemon);
+bool adicionarPokemon(char* nomePokemon, Pokedex* pokedex);
+void removerPokemon(Pokemon* pokemon, Pokedex* pokedex);
+
 //Pokedex
 Pokemon* buscaNaPokedex(char* nomePokemon, Pokedex* pokedex);
 void deletaPokedex(Pokedex* pokedex);
 
-//Pokemon
-bool validarNome(char* nomePokemon);
-bool adicionarPokemon(char* nomePokemon, Pokedex* pokedex);
-void removerPokemon(char* nomePokemon, Pokemon* pokemon, Pokedex* pokedex);
-// void consultarPokedex();
-// void trocarPokemon();
-
 //Configurações do sistema
-void configurarServidor(int argc, char **argv);
-int aceitarConexaoCliente();
+void configurarServidor(int argc, char **argv, int* socketServidor);
+int aceitarConexaoCliente(int* socketServidor);
+void usageServidor(int argc, char **argv);
+
 
 #endif
